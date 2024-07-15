@@ -229,6 +229,12 @@ _abbreviations = {
             # Korean doesn't typically use abbreviations in the same way as Latin-based scripts.
         ]
     ],
+    "vi": [
+        (re.compile("\\b%s\\." % x[0], re.IGNORECASE), x[1])
+        for x in [
+            # Vietnamese doesn't typically use abbreviations in the same way as Latin-based scripts.
+        ]
+    ],
 }
 
 
@@ -425,6 +431,18 @@ _symbols_multilingual = {
             ("°", " 도 "),
         ]
     ],
+    "vi": [
+        (re.compile(r"%s" % re.escape(x[0]), re.IGNORECASE), x[1])
+        for x in [
+            ("&", " và "),
+            ("@", " a còng "),
+            ("%", " phần trăm "),
+            ("#", " thăng "),
+            ("$", " đô la "),
+            ("£", " pao "),
+            ("°", " độ "),
+        ]
+    ],
 }
 
 
@@ -535,7 +553,8 @@ def expand_numbers_multilingual(text, lang="en"):
             pass
         if lang != "tr":
             text = re.sub(_decimal_number_re, lambda m: _expand_decimal_point(m, lang), text)
-        text = re.sub(_ordinal_re[lang], lambda m: _expand_ordinal(m, lang), text)
+        if lang != "vi":
+            text = re.sub(_ordinal_re[lang], lambda m: _expand_ordinal(m, lang), text)
         text = re.sub(_number_re, lambda m: _expand_number(m, lang), text)
     return text
 

@@ -1,6 +1,6 @@
 import os
 import gc
-
+import torch
 from trainer import Trainer, TrainerArgs
 
 from TTS.config.shared_configs import BaseDatasetConfig
@@ -8,6 +8,15 @@ from TTS.tts.datasets import load_tts_samples
 from TTS.tts.layers.xtts.trainer.gpt_trainer import GPTArgs, GPTTrainer, GPTTrainerConfig, XttsAudioConfig
 from TTS.utils.manage import ModelManager
 
+def remove_optimizer(model_dir):
+  model_path = os.path.join(model_dir, "best_model.pth")
+  checkpoint = torch.load(model_path, map_location=torch.device("cpu"))
+  del checkpoint["optimizer"]
+  #https://github.com/coqui-ai/TTS/discussions/3474#discussioncomment-7965683
+  for key in list(checkpoint["model"].keys()):
+      if "dvae" in key:
+          del checkpoint["model"][key]
+  torch.save(checkpoint, os.path.join(model_dir, "model_small.pth") )
 
 def train_gpt(language, num_epochs, batch_size, grad_acumm, train_csv, eval_csv, output_path, max_audio_length=255995):
     #  Logging parameters
@@ -164,6 +173,9 @@ def train_gpt(language, num_epochs, batch_size, grad_acumm, train_csv, eval_csv,
     speaker_ref = train_samples[longest_text_idx]["audio_file"]
 
     trainer_out_path = trainer.output_path
+    
+    ## Remove unused optimizer to make checkpoint smaller
+    remove_optimizer(trainer_out_path)
 
     # deallocate VRAM and RAM
     del model, trainer, train_samples, eval_samples

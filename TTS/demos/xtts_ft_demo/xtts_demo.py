@@ -145,7 +145,7 @@ if __name__ == "__main__":
         "--grad_acumm",
         type=int,
         help="Grad accumulation steps. Default: 1",
-        default=1,
+        default=64,
     )
     parser.add_argument(
         "--max_audio_length",
@@ -173,7 +173,7 @@ if __name__ == "__main__":
             )
             lang = gr.Dropdown(
                 label="Dataset Language",
-                value="en",
+                value="vi",
                 choices=[
                     "en",
                     "es",
@@ -190,7 +190,8 @@ if __name__ == "__main__":
                     "zh",
                     "hu",
                     "ko",
-                    "ja"
+                    "ja",
+                    "vi"
                 ],
             )
             progress_data = gr.Label(
@@ -342,6 +343,7 @@ if __name__ == "__main__":
                             "hu",
                             "ko",
                             "ja",
+                            "vi"
                         ]
                     )
                     tts_text = gr.Textbox(
@@ -408,7 +410,7 @@ if __name__ == "__main__":
             )
 
     demo.launch(
-        share=True,
+        share=False,
         debug=False,
         server_port=args.port,
         server_name="0.0.0.0"
